@@ -26,20 +26,23 @@ fn compile(input: String) -> String {
     output.push_str("fn main() {");
     output.push_str("let mut pointer = 0usize;");
     output.push_str("let mut data = [0u8; 30000];");
-    for command in fs::read_to_string(input).unwrap().chars() {
-        match command {
-            '>' => output.push_str("pointer += 1;"),
-            '<' => output.push_str("pointer -= 1;"),
-            '+' => output.push_str("data[pointer] = data[pointer].wrapping_add(1);"),
-            '-' => output.push_str("data[pointer] = data[pointer].wrapping_sub(1);"),
-            '.' => output.push_str("print!(\"{}\", data[pointer] as char);"),
-            ',' => {
-                output.push_str("stdout().flush().unwrap();");
-                output.push_str("data[pointer] = stdin().bytes().next().unwrap().unwrap();")
+    for line in fs::read_to_string(input).unwrap().lines() {
+        for command in line.chars() {
+            match command {
+                '>' => output.push_str("pointer += 1;"),
+                '<' => output.push_str("pointer -= 1;"),
+                '+' => output.push_str("data[pointer] = data[pointer].wrapping_add(1);"),
+                '-' => output.push_str("data[pointer] = data[pointer].wrapping_sub(1);"),
+                '.' => output.push_str("print!(\"{}\", data[pointer] as char);"),
+                ',' => {
+                    output.push_str("stdout().flush().unwrap();");
+                    output.push_str("data[pointer] = stdin().bytes().next().unwrap().unwrap();")
+                }
+                '[' => output.push_str("while data[pointer] > 0 {"),
+                ']' => output.push('}'),
+                '#' => break,
+                _ => {}
             }
-            '[' => output.push_str("while data[pointer] > 0 {"),
-            ']' => output.push('}'),
-            _ => {}
         }
     }
     output.push('}');
