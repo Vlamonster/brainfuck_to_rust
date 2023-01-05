@@ -46,7 +46,6 @@ fn compile(input: String) -> String {
     output
 }
 
-#[cfg(target_os = "windows")]
 fn main() {
     let args = Args::parse();
 
@@ -55,9 +54,9 @@ fn main() {
         fs::remove_dir_all("output").ok();
 
         // Initialize new Cargo project for output.
-        Command::new("cmd")
-            .arg("/c")
-            .arg("cargo init -q output")
+        Command::new("cargo")
+            .arg("init")
+            .arg("output")
             .spawn()
             .unwrap()
             .wait()
@@ -68,9 +67,10 @@ fn main() {
         file.write_all(compile(args.input).as_bytes()).unwrap();
 
         // Format the file.
-        Command::new("cmd")
-            .arg("/c")
-            .arg("cargo fmt --manifest-path output/Cargo.toml")
+        Command::new("cargo")
+            .arg("fmt")
+            .arg("--manifest-path")
+            .arg("output/Cargo.toml")
             .spawn()
             .unwrap()
             .wait()
@@ -78,53 +78,12 @@ fn main() {
     }
 
     if args.run {
-        // Run new Cargo project.
-        Command::new("cmd")
-            .arg("/c")
-            .arg("cargo run --release --manifest-path output/Cargo.toml")
-            .spawn()
-            .unwrap()
-            .wait()
-            .unwrap();
-    }
-}
-
-#[cfg(target_os = "linux")]
-fn main() {
-    let args = Args::parse();
-
-    if args.compile {
-        // Delete old Cargo project.
-        fs::remove_dir_all("output").ok();
-
-        // Initialize new Cargo project for output.
-        Command::new("sh")
-            .arg("-c")
-            .arg("cargo init -q output")
-            .spawn()
-            .unwrap()
-            .wait()
-            .unwrap();
-
-        // Write main.rs file.
-        let mut file = File::create("output/src/main.rs").unwrap();
-        file.write_all(compile(args.input).as_bytes()).unwrap();
-
-        // Format the file.
-        Command::new("sh")
-            .arg("-c")
-            .arg("cargo fmt --manifest-path output/Cargo.toml")
-            .spawn()
-            .unwrap()
-            .wait()
-            .unwrap();
-    }
-
-    if args.run {
-        // Run new Cargo project.
-        Command::new("sh")
-            .arg("-c")
-            .arg("cargo run --release --manifest-path output/Cargo.toml")
+        // Run Cargo project.
+        Command::new("cargo")
+            .arg("run")
+            .arg("--release")
+            .arg("--manifest-path")
+            .arg("output/Cargo.toml")
             .spawn()
             .unwrap()
             .wait()
