@@ -46,6 +46,7 @@ fn compile(input: String) -> String {
     output
 }
 
+#[cfg(target_os = "windows")]
 fn main() {
     let args = Args::parse();
 
@@ -86,6 +87,54 @@ fn main() {
         // Run new Cargo project.
         Command::new("cmd")
             .arg("/c")
+            .arg("cargo run --release --manifest-path output/Cargo.toml")
+            .spawn()
+            .unwrap()
+            .wait()
+            .unwrap();
+    }
+}
+
+#[cfg(target_os = "linux")]
+fn main() {
+    let args = Args::parse();
+
+    if args.compile {
+        Command::new("sh")
+            .arg("-c")
+            .arg("rm -r output")
+            .spawn()
+            .unwrap()
+            .wait()
+            .unwrap();
+
+        // Initialize new Cargo project for output.
+        Command::new("sh")
+            .arg("-c")
+            .arg("cargo init -q output")
+            .spawn()
+            .unwrap()
+            .wait()
+            .unwrap();
+
+        // Write main.rs file.
+        let mut file = File::create("output/src/main.rs").unwrap();
+        file.write_all(compile(args.input).as_bytes()).unwrap();
+
+        // Format the file.
+        Command::new("sh")
+            .arg("-c")
+            .arg("cargo fmt --manifest-path output/Cargo.toml")
+            .spawn()
+            .unwrap()
+            .wait()
+            .unwrap();
+    }
+
+    if args.run {
+        // Run new Cargo project.
+        Command::new("sh")
+            .arg("-c")
             .arg("cargo run --release --manifest-path output/Cargo.toml")
             .spawn()
             .unwrap()
