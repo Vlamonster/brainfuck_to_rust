@@ -52,13 +52,7 @@ fn main() {
 
     if args.compile {
         // Delete old Cargo project.
-        Command::new("cmd")
-            .arg("/c")
-            .arg("rd /s/q output 2>nul")
-            .spawn()
-            .unwrap()
-            .wait()
-            .unwrap();
+        fs::remove_dir_all("output").ok();
 
         // Initialize new Cargo project for output.
         Command::new("cmd")
@@ -100,13 +94,8 @@ fn main() {
     let args = Args::parse();
 
     if args.compile {
-        Command::new("sh")
-            .arg("-c")
-            .arg("rm -r output")
-            .spawn()
-            .unwrap()
-            .wait()
-            .unwrap();
+        // Delete old Cargo project.
+        fs::remove_dir_all("output").ok();
 
         // Initialize new Cargo project for output.
         Command::new("sh")
