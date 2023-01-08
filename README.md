@@ -21,3 +21,5 @@ cargo run --release -- <path> -c
       of a Sierpinski triangle.
 * tictactoe.bf
   * Example from Daniel B. Cristofani (2020) that lets the user play a game of tic-tac-toe.
+* mandelbrot.bf
+  * Example from Erik Bosman that draws the Mandelbrot set. I suggest compiling and running separately.
